@@ -4,6 +4,9 @@ import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
 import { env } from './env.js'
 import auth from './routes/auth.js'
+import users from './routes/users.js'
+import projects from './routes/projects.js'
+import logs from './routes/v1/logs.js'
 
 const app = new Hono()
 
@@ -20,7 +23,13 @@ app.get('/health', (c) => {
     })
 })
 
-app.route('/api/auth/', auth)
+app.route('/api/auth', auth)
+
+app.route('/api/users', users)
+
+app.route('/api/projects', projects)
+
+app.route('/api/v1/logs', logs)
 
 // Start server using node-server runner
 serve(
