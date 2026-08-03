@@ -18,7 +18,7 @@ const ingestLog = async (c: any) => {
         message: 'Unauthorized: Missing X-API-Key header' }, 401)
   }
 
-  // Hash incoming key and match with DB
+  // Hash incoming key deterministically and match with the stored project lookup hash
   const apiKeyHash = await hashApiKey(apiKey)
   const project = await db
     .selectFrom('projects')
@@ -98,11 +98,8 @@ const queryLogs = async (c: any) => {
 
   return c.json({
     success: true,
-    projectId,
-    count: logs.length,
-    limit,
-    offset,
-    logs,
+    message: 'Logs retrieved successfully',
+    data: logs,
   })
 }
 

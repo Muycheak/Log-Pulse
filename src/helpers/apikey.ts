@@ -1,7 +1,7 @@
-import bcrypt from "bcryptjs";
+import { createHash } from 'node:crypto'
 
 async function hashApiKey(key: string): Promise<string> {
-  return bcrypt.hash(key, 12)
+  return createHash('sha256').update(key).digest('hex')
 }
 
 export { hashApiKey }

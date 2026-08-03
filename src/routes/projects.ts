@@ -3,7 +3,6 @@ import { requireAuth, type AuthEnv } from "../middlewares/auth.js";
 import { createProjectSchema } from "../validators/projects.js";
 import { db } from "../db/index.js";
 import { zValidator } from "@hono/zod-validator";
-import bcrypt from 'bcryptjs'
 import { randomBytes } from "crypto";
 import { hashApiKey } from "../helpers/apikey.js";
 
@@ -55,7 +54,7 @@ const listAllProjects = async (c: any) => {
 
   const userProjects = await db
     .selectFrom('projects')
-    .select(['id', 'name', 'api_key_hash', 'created_at'])
+    .select(['id', 'name', 'created_at'])
     .where('user_id', '=', userId)
     .orderBy('created_at', 'desc')
     .execute()
@@ -67,9 +66,42 @@ const listAllProjects = async (c: any) => {
   })
 }
 
+const deleteProjectByID = async (c: any) => {
+  const userId = c.get('userId')
+  const projectId = c.req.param('projectId') ?? c.req.query('projectId')
+
+  if (!projectId) {
+    return c.json({ success: false, message: 'Project ID is required' }, 400)
+  }
+
+  const project = await db
+    .selectFrom('projects')
+    .select('id')
+    .where('id', '=', projectId)
+    .where('user_id', '=', userId)
+    .executeTakeFirst()
+
+  if (!project) {
+    return c.json({ success: false, message: 'Project not found or unauthorized' }, 404)
+  }
+
+  await db
+    .deleteFrom('projects')
+    .where('id', '=', projectId)
+    .execute()
+
+  return c.json({
+    success: true,
+    message: 'Project deleted successfully',
+  })
+}
+
 projects.get('', listAllProjects)
 projects.post('', zValidator('json', createProjectSchema), createProject)
 projects.get('/', listAllProjects)
 projects.post('/',  zValidator('json', createProjectSchema), createProject)
+projects.delete('/:projectId', deleteProjectByID)
+projects.delete('', deleteProjectByID)
+projects.delete('/', deleteProjectByID)
 
 export default projects
