@@ -85,10 +85,7 @@ const deleteProjectByID = async (c: any) => {
     return c.json({ success: false, message: 'Project not found or unauthorized' }, 404)
   }
 
-  await db
-    .deleteFrom('projects')
-    .where('id', '=', projectId)
-    .execute()
+  await db.deleteFrom('projects').where('id', '=', projectId).execute()
 
   return c.json({
     success: true,
@@ -99,7 +96,7 @@ const deleteProjectByID = async (c: any) => {
 projects.get('', listAllProjects)
 projects.post('', zValidator('json', createProjectSchema), createProject)
 projects.get('/', listAllProjects)
-projects.post('/',  zValidator('json', createProjectSchema), createProject)
+projects.post('/', zValidator('json', createProjectSchema), createProject)
 projects.delete('/:projectId', deleteProjectByID)
 projects.delete('', deleteProjectByID)
 projects.delete('/', deleteProjectByID)

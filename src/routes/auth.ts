@@ -85,7 +85,7 @@ auth.post('/register', zValidator('json', registerSchema), async (c) => {
                 email: newUser.email,
             },
         }
-    })
+    }, 201)
 });
 
 export default auth;

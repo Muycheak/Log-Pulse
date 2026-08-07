@@ -41,3 +41,5 @@ serve(
         console.log(`🚀 Server running at http://localhost:${info.port}`)
     }
 )
+
+export default app
