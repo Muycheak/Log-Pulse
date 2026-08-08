@@ -7,12 +7,53 @@ import auth from './routes/auth.js'
 import users from './routes/users.js'
 import projects from './routes/projects.js'
 import logs from './routes/v1/logs.js'
+import { rateLimiter } from './middlewares/rateLimiter.js'
+import { HTTPException } from 'hono/http-exception'
 
 const app = new Hono()
 
 // Global Middlewares
 app.use('*', logger()) // Logs incoming HTTP requests to console
 app.use('*', cors())   // Enables CORS for API consumers
+app.use(
+  '*',
+  rateLimiter({
+    windowMs: 60 * 1000,
+    max: 100,
+    message: 'Rate limit exceeded: 100 requests per minute limit.',
+  })
+)  // Rate limiting middleware to prevent abuse
+
+// 404 Not Found Handler
+app.notFound((c) => {
+  return c.json(
+    {
+      error: 'Not Found',
+      message: `Cannot ${c.req.method} ${c.req.path}`,
+    },
+    404
+  )
+})
+
+// Global Error Handler
+app.onError((err, c) => {
+  console.error(`[Unhandled Error] ${c.req.method} ${c.req.path}:`, err)
+
+  // Handle Hono HTTP exceptions
+  if (err instanceof HTTPException) {
+    return err.getResponse()
+  }
+
+  // Hide internal database errors in production
+  const isProduction = env.NODE_ENV === 'production'
+  return c.json(
+    {
+      error: 'Internal Server Error',
+      message: isProduction ? 'An unexpected error occurred' : err.message,
+    },
+    500
+  )
+})
 
 // Health Check
 app.get('/health', (c) => {
