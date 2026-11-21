@@ -1,9 +1,12 @@
-# LogPulse
+<p align="center">
+  <img src="./assets/logpulse-logo.svg" alt="LogPulse logo" width="240" />
+</p>
 
-LogPulse is a lightweight log ingestion and project management API built with TypeScript, Hono, Kysely, and PostgreSQL.
+LogPulse is a log ingestion and project management application built with Vue, TypeScript, Hono, Kysely, and PostgreSQL.
 
 It provides:
 
+- A web dashboard for managing projects and reviewing logs
 - User registration and login with JWT authentication
 - Project creation, listing, and deletion
 - API key generation for project-based log ingestion
@@ -20,6 +23,7 @@ It provides:
 - Zod validation
 - bcryptjs for password hashing
 - SHA-256 for deterministic API key lookup hashing
+- Vue and Vite for the dashboard
 
 ## Project Structure
 
@@ -38,7 +42,7 @@ src/
 
 Before running the project, make sure you have:
 
-- Node.js 18+
+- Node.js 22.13+
 - pnpm
 - PostgreSQL running locally or remotely
 
@@ -73,10 +77,36 @@ Development mode:
 pnpm dev
 ```
 
+In a second terminal, start the dashboard:
+
+```bash
+pnpm dev:dashboard
+```
+
+Open the Vite URL (usually `http://localhost:5173`). The dashboard proxies API requests to the Hono server on port 3000.
+
+Dashboard routes:
+
+- `/login` — sign in
+- `/register` — create an account
+- `/dashboard` — authenticated project and log dashboard
+
+Build the dashboard for the production server:
+
+```bash
+pnpm build:dashboard
+```
+
 Production-style run:
 
 ```bash
 pnpm start
+```
+
+The production server serves the built dashboard at `http://localhost:3000`. To run the app and PostgreSQL together with Docker:
+
+```bash
+docker compose up --build
 ```
 
 ## API Overview

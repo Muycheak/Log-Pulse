@@ -105,10 +105,8 @@ const queryLogs = async (c: any) => {
 
 
 
-logs.use('*', requireAuth)
-
-logs.get('/', zValidator('query', queryLogsSchema), queryLogs)
-logs.get('', zValidator('query', queryLogsSchema), queryLogs)
+logs.get('/', requireAuth, zValidator('query', queryLogsSchema), queryLogs)
+logs.get('', requireAuth, zValidator('query', queryLogsSchema), queryLogs)
 logs.post('/', zValidator('json', ingestLogSchema), ingestLog)
 logs.post('', zValidator('json', ingestLogSchema), ingestLog)
 

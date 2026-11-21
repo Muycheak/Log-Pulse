@@ -8,6 +8,12 @@ RUN corepack enable \
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
+FROM dependencies AS dashboard-build
+
+COPY vite.config.ts ./
+COPY web ./web
+RUN pnpm build:dashboard
+
 FROM node:22-alpine AS runner
 
 ENV NODE_ENV=production
@@ -24,6 +30,7 @@ COPY --from=dependencies --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --chown=nodejs:nodejs package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --chown=nodejs:nodejs src ./src
 COPY --chown=nodejs:nodejs tsconfig.json kysely.config.ts ./
+COPY --from=dashboard-build --chown=nodejs:nodejs /app/web/dist ./web/dist
 
 USER nodejs
 

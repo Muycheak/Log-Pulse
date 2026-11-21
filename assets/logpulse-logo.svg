@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="48" viewBox="0 0 240 48" role="img" aria-labelledby="title">
+  <title id="title">LogPulse</title>
+  <rect x="4" y="6" width="36" height="36" rx="11" fill="#e8f5ee"/>
+  <rect x="13" y="25" width="4" height="10" rx="2" fill="#20815d" opacity=".6"/>
+  <rect x="20" y="16" width="4" height="19" rx="2" fill="#20815d"/>
+  <rect x="27" y="21" width="4" height="14" rx="2" fill="#20815d" opacity=".78"/>
+  <text x="52" y="34" fill="#15221d" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="-1.5">log</text>
+  <text x="91" y="34" fill="#248b65" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="-1.5">pulse</text>
+</svg>

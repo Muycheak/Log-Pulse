@@ -1,4 +1,5 @@
 import { serve } from '@hono/node-server'
+import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
@@ -71,6 +72,13 @@ app.route('/api/users', users)
 app.route('/api/projects', projects)
 
 app.route('/api/v1/logs', logs)
+
+app.get('/', serveStatic({ root: './web/dist', path: '/index.html' }))
+app.get('/login', serveStatic({ root: './web/dist', path: '/index.html' }))
+app.get('/register', serveStatic({ root: './web/dist', path: '/index.html' }))
+app.get('/dashboard', serveStatic({ root: './web/dist', path: '/index.html' }))
+app.get('/assets/*', serveStatic({ root: './web/dist' }))
+app.get('/favicon.svg', serveStatic({ root: './web/dist' }))
 
 // Start server using node-server runner
 serve(
