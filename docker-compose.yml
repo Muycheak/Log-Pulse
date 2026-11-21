@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-log_pulse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-log_pulse}
+      POSTGRES_DB: ${POSTGRES_DB:-log_pulse}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-log_pulse} -d ${POSTGRES_DB:-log_pulse}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  migrate:
+    build:
+      context: .
+    image: log-pulse:local
+    command: ["pnpm", "migrate:latest"]
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-log_pulse}:${POSTGRES_PASSWORD:-log_pulse}@postgres:5432/${POSTGRES_DB:-log_pulse}
+      JWT_SECRET: ${JWT_SECRET:-change-me-to-a-secret-at-least-16-chars-long}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  app:
+    build:
+      context: .
+    image: log-pulse:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT:-3000}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-log_pulse}:${POSTGRES_PASSWORD:-log_pulse}@postgres:5432/${POSTGRES_DB:-log_pulse}
+      JWT_SECRET: ${JWT_SECRET:-change-me-to-a-secret-at-least-16-chars-long}
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  postgres_data:
